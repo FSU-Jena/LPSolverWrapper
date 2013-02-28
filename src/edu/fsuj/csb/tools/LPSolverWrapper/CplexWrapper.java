@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import edu.fsuj.csb.tools.programwrapper.OutputHandler;
@@ -58,34 +57,12 @@ public class CplexWrapper extends LPSolveWrapper implements OutputHandler {
 		bw.close();*/
 	}
 	
-	/**
-	 * converts a LPCondition object into a string for use in lp files for the cplex program
-	 * @param lpc the condition to be converted
-	 * @return the condition's string representation
-	 */
-	private String lpConditionToString(LPCondition lpc){
-		if (lpc.left!=null){ // left term given:
-			if (lpc.right ==null)	{ // but no right term 
-				
-//				  		left coeff * term          <=       right coeff 
-				return lpc.left.toString(lpc.k1)+" <= "+lpc.k2.toString() + ((lpc.comment()==null)?"":("\t\\ "+lpc.comment()));
-			}
-//			right term given:
-//									coeff * term         -      right term * coeff        <= 0
-			return lpc.left.toString(lpc.k1)+" - "+lpc.right.toString(lpc.k2)+" <= 0" + ((lpc.comment()==null)?"":("\t\\ "+lpc.comment()));
-		}
-
-		// no left term (but coefficient)
-// 															right coeff		 :  right coeff * term          >=      left coeff    
-		return ((lpc.right==null)?lpc.k2.toString():lpc.right.toString(lpc.k2))+" >= "+lpc.k1.toString() + ((lpc.comment()==null)?"":("\t\\ "+lpc.comment()));			
-	}
-	
 	/* (non-Javadoc)
 	 * @see edu.fsuj.csb.tools.LPSolverWrapper.LPSolveWrapper#writeConditions(java.io.BufferedWriter)
 	 */
 	protected void writeConditions(BufferedWriter bw) throws IOException {
 		bw.write("Subject To\n");
- 		for (Iterator<LPCondition> it = conditions.iterator(); it.hasNext();) bw.write(" c"+(i++)+": "+lpConditionToString(it.next()) + "\n");
+ 		for (Iterator<LPCondition> it = conditions.iterator(); it.hasNext();) bw.write(" c"+(i++)+": "+it.next().toString() + "\n");
   }
 	
 	/**
@@ -146,38 +123,7 @@ public class CplexWrapper extends LPSolveWrapper implements OutputHandler {
 		super.startAndWait(params);
   }
 
-	/**
-	 * read the output of the cplex program and parse it into solution values
-	 * @return a mapping from LPVariables to their respective values
-	 */
-	public TreeMap<LPVariable,Double> getSolution(){
-		String outputString=getOutput();
-		if (outputString.contains("No integer feasible solution exists")) return null; 
-		TreeMap<LPVariable, Double> result=new TreeMap<LPVariable, Double>(ObjectComparator.get());
-		String [] output=outputString.split("\n");		
-		int lineNumber=0;
-		while (!output[lineNumber].startsWith("Variable Name")){ // search for beginning of variable listing
-			lineNumber++;
-			if (lineNumber>=output.length){
-				System.err.println(outputString);
-				return null;
-			}
-		}
-		
-		while (true) {			
-			Double value=0.0;
-			try{
-				String[] dummy=output[++lineNumber].split(" ");
-				value=Double.parseDouble(dummy[dummy.length-1].trim());
-				result.put(new LPVariable(dummy[0]),value);
-			} catch (IndexOutOfBoundsException iobe){
-				break;
-			} catch (NumberFormatException nfe){
-				break;
-			}
-		}
-		return result;
-	}
+	protected static String key="Actual values of the variables";
 	
 	/**
 	 * @return a description of the current LP problem, this wrapper is holding
@@ -186,7 +132,7 @@ public class CplexWrapper extends LPSolveWrapper implements OutputHandler {
 		StringBuffer sb=new StringBuffer(this.toString());
 		sb.append("\nConditions:\n");
 		i=1;
- 		for (Iterator<LPCondition> it = conditions.iterator(); it.hasNext();) sb.append(" c"+(i++)+": "+lpConditionToString(it.next()) + "\n");
+ 		for (Iterator<LPCondition> it = conditions.iterator(); it.hasNext();) sb.append(" c"+(i++)+": "+it.next().toString() + "\n");
 		if (ranges!=null)	for (Iterator<LPRange> it = ranges.iterator(); it.hasNext();) sb.append(" c"+(i++)+": "+lpRangeToString(it.next()) + "\n");
 		if (intVars != null && !intVars.isEmpty()) {
 			sb.append("Integers:\n");

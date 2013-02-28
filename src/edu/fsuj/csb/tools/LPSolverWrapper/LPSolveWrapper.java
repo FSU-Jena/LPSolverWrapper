@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import edu.fsuj.csb.tools.programwrapper.ProgramWrapper;
@@ -119,7 +120,7 @@ public class LPSolveWrapper extends ProgramWrapper {
 	 * @throws IOException
 	 */
 	protected void writeConditions(BufferedWriter bw) throws IOException {
- 		for (Iterator<LPCondition> it = conditions.iterator(); it.hasNext();) bw.write(it.next() + "\n");
+ 		for (Iterator<LPCondition> it = conditions.iterator(); it.hasNext();) bw.write(it.next() + ";\n");
   }
 
 	/**
@@ -135,33 +136,7 @@ public class LPSolveWrapper extends ProgramWrapper {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException {
-
-		LPVariable A = new LPVariable("RA");
-		LPVariable B = new LPVariable("RB");
-		LPVariable C = new LPVariable("RC");
-		LPVariable Ain = new LPVariable("RAin");
-		LPVariable Bin = new LPVariable("RBin");
-		LPVariable Cin = new LPVariable("RCin");
-		
-		LPSum sum1 = new LPSum(Ain,new LPSum(Bin,Cin));
-		LPSum sum2 = new LPSum(B,C);
-
-
-		LPSolveWrapper LPW = new LPSolveWrapper();
-		LPW.addCondition(new LPCondition(new LPSum(Ain,C),A));
-		LPW.addCondition(new LPCondition(new LPSum(Bin,C),B));
-		LPW.addCondition(new LPCondition(new LPSum(new LPSum(2.0,Cin,A),B),2.0,C));
-		LPW.addCondition(new LPCondition(2.0,sum2));
-		LPW.setEqual(sum1,10);
-		LPW.minimize(sum1);
-		LPW.startBlocking();
-		System.out.println(LPW.getOutput());
-		ProgramWrapper pr=new ProgramWrapper("cat input.lp");
-		pr.startBlocking();
-		System.out.println();
-		System.out.println(pr.getOutput());
-	}
+	public static void main(String[] args) throws IOException, InterruptedException {}
 
 	/**
 	 * adds a term=value assignment to the current linear program
@@ -219,5 +194,43 @@ public class LPSolveWrapper extends ProgramWrapper {
 	 */
 	public void setTaskfileName(String taskFilename) {
 		lpFile = new File(taskFilename);
+		System.out.println(lpFile.getAbsolutePath());
 		setCommand("lp_solve "+taskFilename);
-  }}
+  }
+	
+	protected static String key="Actual values of the variables";
+	
+	/**
+	 * read the output of the cplex program and parse it into solution values
+	 * @return a mapping from LPVariables to their respective values
+	 */
+	public TreeMap<LPVariable,Double> getSolution(){
+		String outputString=getOutput();
+		if (outputString.contains("No integer feasible solution exists")) return null; 
+		TreeMap<LPVariable, Double> result=new TreeMap<LPVariable, Double>(ObjectComparator.get());
+		String [] output=outputString.split("\n");		
+		int lineNumber=0;
+		while (!output[lineNumber].startsWith(key)){ // search for beginning of variable listing
+			lineNumber++;
+			if (lineNumber>=output.length){
+				System.err.println(outputString);
+				return null;
+			}
+		}
+		
+		while (true) {			
+			Double value=0.0;
+			try{
+				String[] dummy=output[++lineNumber].split(" ");
+				value=Double.parseDouble(dummy[dummy.length-1].trim());
+				result.put(new LPVariable(dummy[0]),value);
+			} catch (IndexOutOfBoundsException iobe){
+				break;
+			} catch (NumberFormatException nfe){
+				break;
+			}
+		}
+		return result;
+	}
+	
+}
