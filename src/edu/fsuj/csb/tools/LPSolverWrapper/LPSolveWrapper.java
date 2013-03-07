@@ -217,16 +217,19 @@ public class LPSolveWrapper extends ProgramWrapper {
 				return null;
 			}
 		}
-		
-		while (true) {			
+		lineNumber++;
+		while (lineNumber<output.length) {			
 			Double value=0.0;
 			try{
-				String[] dummy=output[++lineNumber].split(" ");
+				String[] dummy=output[lineNumber].split(" ");
 				value=Double.parseDouble(dummy[dummy.length-1].trim());
 				result.put(new LPVariable(dummy[0]),value);
+				lineNumber++;
 			} catch (IndexOutOfBoundsException iobe){
+				iobe.printStackTrace();
 				break;
 			} catch (NumberFormatException nfe){
+				nfe.printStackTrace();
 				break;
 			}
 		}
