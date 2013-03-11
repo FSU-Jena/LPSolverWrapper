@@ -211,6 +211,7 @@ public class LPSolveWrapper extends ProgramWrapper {
 		String [] output=outputString.split("\n");		
 		int lineNumber=0;
 		while (!output[lineNumber].startsWith(key)){ // search for beginning of variable listing
+			if (output[lineNumber].startsWith("Value of objective function")) System.out.println(output[lineNumber]);
 			lineNumber++;
 			if (lineNumber>=output.length){
 				System.err.println(outputString);
