@@ -19,7 +19,6 @@ import edu.fsuj.csb.tools.xml.ObjectComparator;
 public class CplexWrapper extends LPSolveWrapper implements OutputHandler {
 	private int i=0;
 	private String taskfilename="cplex.batch";
-	protected TreeSet<LPVariable> binVars;
 		
 	/**
 	 * creates a new Instance of this class
@@ -143,15 +142,6 @@ public class CplexWrapper extends LPSolveWrapper implements OutputHandler {
 		sb.append(((minimize)?"Minimize":"Maximize")+"\n obj: " + (objective!=null?objective:"") + ";\n");
  		return sb.toString();
 	}
-
-	/**
-	 * declares a LPVariable to be binary (boolean)
-	 * @param v
-	 */
-	public void addBinVar(LPVariable v) {
-		if (binVars == null) binVars = new TreeSet<LPVariable>(ObjectComparator.get());
-		binVars.add(v);
-  }
 
 	
 	/* (non-Javadoc)

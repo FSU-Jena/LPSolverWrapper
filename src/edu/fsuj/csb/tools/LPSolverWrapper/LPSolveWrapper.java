@@ -21,6 +21,7 @@ public class LPSolveWrapper extends ProgramWrapper {
 	protected TreeSet<LPCondition> conditions;
 	protected LPTerm objective;
 	protected TreeSet<LPVariable> intVars;
+	protected TreeSet<LPVariable> binVars;
 	protected TreeSet<LPRange> ranges;
 	protected boolean minimize=false;
 	
@@ -97,6 +98,14 @@ public class LPSolveWrapper extends ProgramWrapper {
 		if (intVars != null && !intVars.isEmpty()) {
 			bw.write("int\n");
 			for (Iterator<LPVariable> it = intVars.iterator(); it.hasNext();) {
+				bw.write(it.next().toString());
+				if (it.hasNext()) bw.write(", "); else
+				bw.write(";\n");
+			}
+		}
+		if (binVars != null && !binVars.isEmpty()) {
+			bw.write("binary\n");
+			for (Iterator<LPVariable> it = binVars.iterator(); it.hasNext();) {
 				bw.write(it.next().toString());
 				if (it.hasNext()) bw.write(", "); else
 				bw.write(";\n");
@@ -236,5 +245,14 @@ public class LPSolveWrapper extends ProgramWrapper {
 		}
 		return result;
 	}
+	
+	/**
+	 * declares a LPVariable to be binary (boolean)
+	 * @param v
+	 */
+	public void addBinVar(LPVariable v) {
+		if (binVars == null) binVars = new TreeSet<LPVariable>(ObjectComparator.get());
+		binVars.add(v);
+  }
 	
 }
