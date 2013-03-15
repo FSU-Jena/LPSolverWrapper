@@ -30,13 +30,24 @@ public class LPDiff extends LPSum {
 	 * @see edu.fsuj.csb.tools.LPSolverWrapper.LPSum#toString(java.lang.Double)
 	 */
 	public String toString(Double f) {
-		Double k1=this.k1*f;
-		Double k2=this.k2*f;
+		Double factor=k1*f;
 		
-		if (right==null) return (left==null)?"0":left.toString(k1);		
-		return ((left==null)?"":(left.toString(k1)+" "))+"- "+right.toString(k2);
-		
-//		return ((left==null)?k1.toString():left.toString(k1))+" - "+((right==null)?k2.toString():right.toString(k2));
+		if (right==null) {
+			if (left==null) return "0";
+			return left.toString(factor);		
+		}
+		if (left==null){
+			return "- "+parenthesis(f);
+		}
+		return left.toString(factor)+" - "+parenthesis(f);
 	}
+
+	private String parenthesis(Double f) {
+		Double factor=this.k2*f;
+		if (right instanceof LPVariable) {
+			return right.toString(factor);	    
+    }
+	  return "( "+right.toString(factor)+" )";
+  }
 
 }
