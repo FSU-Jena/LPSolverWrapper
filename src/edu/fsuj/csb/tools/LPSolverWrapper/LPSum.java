@@ -75,7 +75,7 @@ public class LPSum extends LPTerm {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return toString(1.0);
+		return toString(1.0).replace("+ -", "- ");
 	}
 
 }

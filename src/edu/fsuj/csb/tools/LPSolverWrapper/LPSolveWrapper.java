@@ -140,14 +140,6 @@ public class LPSolveWrapper extends ProgramWrapper {
 	}
 
 	/**
-	 * a testing method for the LPSolverWrapper
-	 * @param args
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
-	public static void main(String[] args) throws IOException, InterruptedException {}
-
-	/**
 	 * adds a term=value assignment to the current linear program
 	 * @param term
 	 * @param value
@@ -196,7 +188,16 @@ public class LPSolveWrapper extends ProgramWrapper {
 		if (intVars == null) intVars = new TreeSet<LPVariable>(ObjectComparator.get());
 		intVars.add(v);
 	}
-
+	
+	/**
+	 * declares a LPVariable to be binary (boolean)
+	 * @param v
+	 */
+	public void addBinVar(LPVariable v) {
+		if (binVars == null) binVars = new TreeSet<LPVariable>(ObjectComparator.get());
+		binVars.add(v);
+  }
+	
 	/**
 	 * set the filename, into which the linear program shall be written before optimization
 	 * @param taskFilename
@@ -245,14 +246,6 @@ public class LPSolveWrapper extends ProgramWrapper {
 		}
 		return result;
 	}
-	
-	/**
-	 * declares a LPVariable to be binary (boolean)
-	 * @param v
-	 */
-	public void addBinVar(LPVariable v) {
-		if (binVars == null) binVars = new TreeSet<LPVariable>(ObjectComparator.get());
-		binVars.add(v);
-  }
+
 	
 }

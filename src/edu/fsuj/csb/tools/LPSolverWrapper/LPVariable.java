@@ -20,7 +20,9 @@ public class LPVariable extends LPTerm {
 	 * @return &lt;d&gt;&nbsp;&lt;name-of-variable&gt; if d ist not one, &lt;name-of-variable&gt; otherwise
 	 */
 	public String toString(Double d) {
-	  return ((d!=1)?d.toString()+" ":"")+name;
+		if (d==1.0) return name;
+		if (d==-1.0) return "-"+name;
+	  return d.toString()+" "+name;
 	}
 	
 	/* (non-Javadoc)
