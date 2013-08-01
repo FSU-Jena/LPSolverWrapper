@@ -19,10 +19,10 @@ public class LPSum extends LPTerm {
 	 * @param right the right hand term of the sum
 	 */
 	public LPSum(Double k1,LPTerm left,Double k2, LPTerm right) {
-		this.k1=(left!=null)?k1:0;
+		this.k1=(left==null)?0:k1;
 		this.left=left;		
 		
-		this.k2=(right!=null)?k2:0;
+		this.k2=(right==null)?0:k2;
 		this.right=right;
   }
 
@@ -62,10 +62,10 @@ public class LPSum extends LPTerm {
 		Double k1=this.k1*f;
 		Double k2=this.k2*f;
 		
-		if (left==null){
-			return (right==null)?"0":right.toString(k2);
+		if (left==null||k1==0.0){
+			return (right==null||k2==0.0)?"0":right.toString(k2);
 		} else {
-			return left.toString(k1)+((right==null)?"":(" + "+right.toString(k2)));
+			return left.toString(k1)+((right==null||k2==0.0)?"":(" + "+right.toString(k2)));
 		}
 		
 		//return ((left==null)?k1.toString():left.toString(k1))+" + "+((right==null)?k2.toString():right.toString(k2));

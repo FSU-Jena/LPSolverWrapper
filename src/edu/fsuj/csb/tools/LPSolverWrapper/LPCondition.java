@@ -37,6 +37,18 @@ public class LPCondition {
   }
 	
 	/**
+	 * require left smaller than/equal to right
+	 * @param term
+	 * @param relation
+	 * @param value
+	 * @param comment
+	 */
+	public LPCondition (LPTerm term,int relation, Double value,String comment) {
+		this(term,relation,value);
+		setComment(comment);
+	}
+	
+	/**
 	 * adds/replaces the comment, which will be written into the lp file
 	 * @param comment
 	 */
